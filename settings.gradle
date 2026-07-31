@@ -12,6 +12,7 @@ dependencyResolutionManagement {
         google()
         flatDir { dirs "$rootDir/app/libs" }
         maven { url "https://jitpack.io" }
+        maven { url "https://maven.aliyun.com/repository/jcenter" }
         maven {
             url "http://4thline.org/m2"
             allowInsecureProtocol = true
