@@ -102,18 +102,22 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         int idx = parent.indexOfChild(mBinding.player);
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(0, 24, 0, 24);
-        row.setClickable(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = ResUtil.dp2px(16);
+        row.setLayoutParams(lp);
+        row.setBackgroundResource(R.drawable.selector_item);
         row.setFocusable(true);
-        row.setBackgroundResource(android.R.drawable.list_selector_background);
+        row.setFocusableInTouchMode(true);
+        row.setPadding(0, 8, 0, 8);
         row.setOnClickListener(v -> new DanmuApiDialog(this, this::updateDanmuStatus).show());
         TextView label = new TextView(this);
-        label.setText("弹幕设置");
-        label.setTextSize(15);
+        label.setText(R.string.danmaku_setting);
+        label.setTextColor(ResUtil.getColor(R.color.white));
+        label.setTextSize(18);
         label.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         row.addView(label);
         mDanmuStatus = new TextView(this);
-        mDanmuStatus.setTextSize(13);
+        mDanmuStatus.setTextSize(14);
         mDanmuStatus.setGravity(Gravity.END);
         updateDanmuStatus();
         row.addView(mDanmuStatus);
@@ -123,11 +127,11 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     private void updateDanmuStatus() {
         if (mDanmuStatus == null) return;
         if (!Setting.isDanmuApiEnabled() || TextUtils.isEmpty(Setting.getDanmuApi())) {
-            mDanmuStatus.setText("未配置");
-            mDanmuStatus.setTextColor(0xFF888888);
+            mDanmuStatus.setText(R.string.danmaku_setting_unconfigured);
+            mDanmuStatus.setTextColor(ResUtil.getColor(R.color.white_60));
         } else {
-            mDanmuStatus.setText("已启用");
-            mDanmuStatus.setTextColor(0xFF639922);
+            mDanmuStatus.setText(R.string.danmaku_setting_enabled);
+            mDanmuStatus.setTextColor(ResUtil.getColor(R.color.white));
         }
     }
 

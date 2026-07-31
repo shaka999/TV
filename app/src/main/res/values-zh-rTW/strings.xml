@@ -57,6 +57,13 @@
     <!-- Danmaku -->
     <string name="danmaku">彈幕</string>
     <string name="danmaku_select">選擇彈幕</string>
+    <string name="danmaku_load">彈幕加載</string>
+    <string name="danmaku_api_enable">啟用外部彈幕API</string>
+    <string name="danmaku_api_url">API位址</string>
+    <string name="danmaku_api_auto">自動獲取彈幕</string>
+    <string name="danmaku_setting">彈幕設定</string>
+    <string name="danmaku_setting_unconfigured">未設定</string>
+    <string name="danmaku_setting_enabled">已啟用</string>
 
     <!-- Parse -->
     <string name="parse">解析</string>

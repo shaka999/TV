@@ -57,6 +57,13 @@
     <!-- Danmaku -->
     <string name="danmaku">Danmaku</string>
     <string name="danmaku_select">Select danmaku</string>
+    <string name="danmaku_load">Danmaku load</string>
+    <string name="danmaku_api_enable">Enable external API</string>
+    <string name="danmaku_api_url">API URL</string>
+    <string name="danmaku_api_auto">Auto fetch danmaku</string>
+    <string name="danmaku_setting">Danmaku Setting</string>
+    <string name="danmaku_setting_unconfigured">Not configured</string>
+    <string name="danmaku_setting_enabled">Enabled</string>
 
     <!-- Parse -->
     <string name="parse">Parse</string>
