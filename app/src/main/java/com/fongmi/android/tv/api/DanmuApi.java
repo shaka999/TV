@@ -34,8 +34,8 @@ public class DanmuApi {
             try {
                 String url = apiUrl.replaceAll("/+$", "") + "/api/v2/fongmi/danmaku?name=" + URLEncoder.encode(name, "UTF-8") + "&episode=" + URLEncoder.encode(episode != null ? episode : "", "UTF-8");
                 String json = OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_DANMAKU), url, "danmu_api").execute().body().string();
-                List<Danmaku> items = App.gson().fromJson(json, new TypeToken<List<Danmaku>>() {}.getType());
-                if (items == null) items = new ArrayList<>();
+                List<Danmaku> result = App.gson().fromJson(json, new TypeToken<List<Danmaku>>() {}.getType());
+                final List<Danmaku> items = result != null ? result : new ArrayList<Danmaku>();
                 App.post(() -> {
                     loading = false;
                     callback.onResult(items);
