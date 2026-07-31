@@ -42,7 +42,7 @@ public class Media implements Process {
     }
 
     private boolean isNull() {
-        return Objects.isNull(getPlayer()) || Objects.isNull(getPlayer().getSession());
+        return getPlayer() == null || getPlayer().getSession() == null;
     }
 
     private PlaybackStateCompat getPlaybackState() {

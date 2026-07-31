@@ -18,6 +18,6 @@ public class DanmakuAdapter implements JsonDeserializer<List<Danmaku>> {
         if (!json.isJsonPrimitive()) return App.gson().fromJson(json, typeOfT);
         String text = json.getAsString().trim();
         if (Json.isArray(text)) return App.gson().fromJson(text, typeOfT);
-        else return List.of(Danmaku.from(text));
+        else return new java.util.ArrayList<>(java.util.Arrays.asList(Danmaku.from(text)));
     }
 }

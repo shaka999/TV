@@ -36,7 +36,7 @@ public class ScanTask {
     }
 
     public void start(String url) {
-        App.execute(() -> run(List.of(url)));
+        App.execute(() -> run(new java.util.ArrayList<java.lang.String>(java.util.Arrays.asList(url))));
     }
 
     public void stop() {

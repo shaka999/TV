@@ -51,11 +51,11 @@ public class PlaybackService extends Service {
     }
 
     private boolean isNull() {
-        return Objects.isNull(player) || Objects.isNull(player.getSession());
+        return player == null || player.getSession() == null;
     }
 
     private boolean nonNull() {
-        return Objects.nonNull(player) && Objects.nonNull(player.getSession());
+        return player != null && player.getSession() != null;
     }
 
     private NotificationManagerCompat getManager() {

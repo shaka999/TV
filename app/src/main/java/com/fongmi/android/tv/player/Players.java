@@ -438,7 +438,9 @@ public class Players implements Player.Listener, ParseCallback {
         } else if (isIllegal(result.getRealUrl())) {
             ErrorEvent.url(tag);
         } else {
+            danmakus = result.getDanmaku();
             setMediaItem(result, timeout);
+            DanmuApi.autoLoad(videoName, result.getDesc(), this::mergeExternalDanmu);
         }
     }
 
@@ -448,13 +450,14 @@ public class Players implements Player.Listener, ParseCallback {
         subs = result.getSubs();
         format = result.getFormat();
         danmakus = result.getDanmaku();
-        DanmuApi.autoLoad(videoName, result.getDesc(), items -> {
-            if (items != null && !items.isEmpty()) {
-                if (danmakus == null) danmakus = new ArrayList<>();
-                for (Danmaku item : items) if (!danmakus.contains(item)) danmakus.add(item);
-            }
-        });
+        DanmuApi.autoLoad(videoName, result.getDesc(), this::mergeExternalDanmu);
         parseJob = ParseJob.create(this).start(result, useParse);
+    }
+
+    private void mergeExternalDanmu(List<Danmaku> items) {
+        if (items == null || items.isEmpty()) return;
+        if (danmakus == null) danmakus = new ArrayList<>();
+        for (Danmaku item : items) if (!danmakus.contains(item)) danmakus.add(item);
     }
 
     private void stopParse() {
