@@ -60,6 +60,7 @@ public class ExoUtil {
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
         NextRenderersFactory factory = new NextRenderersFactory(App.get());
+        factory.setEnableDecoderFallback(true);
         factory.setExtensionRendererMode(renderMode);
         return factory;
     }
