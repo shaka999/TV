@@ -33,6 +33,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
+import com.fongmi.android.tv.api.DanmuApi;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.Drm;
@@ -91,6 +92,7 @@ public class Players implements Player.Listener, ParseCallback {
     private String tag;
     private String key;
     private String url;
+    private String videoName;
     private Drm drm;
     private Sub sub;
 
@@ -179,6 +181,10 @@ public class Players implements Player.Listener, ParseCallback {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setVideoName(String name) {
+        this.videoName = name;
     }
 
     public String getTag() {
@@ -442,6 +448,12 @@ public class Players implements Player.Listener, ParseCallback {
         subs = result.getSubs();
         format = result.getFormat();
         danmakus = result.getDanmaku();
+        DanmuApi.load(videoName, result.getDesc(), items -> {
+            if (items != null && !items.isEmpty()) {
+                if (danmakus == null) danmakus = new ArrayList<>();
+                for (Danmaku item : items) if (!danmakus.contains(item)) danmakus.add(item);
+            }
+        });
         parseJob = ParseJob.create(this).start(result, useParse);
     }
 

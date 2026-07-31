@@ -1,9 +1,12 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.viewbinding.ViewBinding;
 
@@ -76,6 +79,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.audioDecode.setOnClickListener(this::setAudioDecode);
         mBinding.videoDecode.setOnClickListener(this::setVideoDecode);
         mBinding.danmakuLoad.setOnClickListener(this::setDanmakuLoad);
+        mBinding.danmakuLoad.setOnLongClickListener(this::onDanmuApi);
     }
 
     private void setVisible() {
@@ -160,6 +164,23 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setDanmakuLoad(View view) {
         Setting.putDanmakuLoad(!Setting.isDanmakuLoad());
         mBinding.danmakuLoadText.setText(getSwitch(Setting.isDanmakuLoad()));
+    }
+
+    private boolean onDanmuApi(View view) {
+        EditText input = new EditText(this);
+        input.setText(Setting.getDanmuApi());
+        input.setHint("http://192.168.1.7:9321");
+        new AlertDialog.Builder(this)
+                .setTitle("外部弹幕 API 地址")
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String url = input.getText().toString().trim();
+                    Setting.putDanmuApi(url);
+                    Setting.putDanmuApiEnabled(!TextUtils.isEmpty(url));
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+        return true;
     }
 
     private void onBackground(View view) {

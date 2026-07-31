@@ -249,6 +249,22 @@ public class Setting {
         Prefers.put("danmaku_show", danmakuShow);
     }
 
+    public static boolean isDanmuApiEnabled() {
+        return Prefers.getBoolean("danmu_api_enabled");
+    }
+
+    public static void putDanmuApiEnabled(boolean enabled) {
+        Prefers.put("danmu_api_enabled", enabled);
+    }
+
+    public static String getDanmuApi() {
+        return Prefers.getString("danmu_api", "");
+    }
+
+    public static void putDanmuApi(String url) {
+        Prefers.put("danmu_api", url);
+    }
+
     public static boolean isZhuyin() {
         return Prefers.getBoolean("zhuyin");
     }
