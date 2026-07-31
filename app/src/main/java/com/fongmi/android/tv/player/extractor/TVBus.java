@@ -35,7 +35,8 @@ public class TVBus implements Source.Extractor, Listener {
     private void init(Core core) {
         try {
             App.get().setHook(core.getHook());
-            tvcore = new TVCore(getPath(core.getSo())).listener(this).auth(core.getAuth()).name(core.getName()).pass(core.getPass()).domain(core.getDomain()).broker(core.getBroker()).serv(0).play(8902).mode(1).init();
+            tvcore = new TVCore(getPath(core.getSo())).listener(this).auth(core.getAuth()).name(core.getName()).pass(core.getPass()).domain(core.getDomain()).broker(core.getBroker()).serv(0).play(8902).mode(1);
+            tvcore.init();
         } catch (Exception ignored) {
         } finally {
             App.get().setHook(null);

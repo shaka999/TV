@@ -154,9 +154,9 @@ public class TrackNameProvider {
         else if (mimeType.contains(MimeTypes.AUDIO_AMR)) return "AMR";
         else if (mimeType.contains(MimeTypes.AUDIO_AMR_NB)) return "AMR-NB";
         else if (mimeType.contains(MimeTypes.AUDIO_AMR_WB)) return "AMR-WB";
-        else if (mimeType.contains(MimeTypes.AUDIO_AV3A)) return "AV3A";
-        else if (mimeType.contains(MimeTypes.VIDEO_MP4)) return "MP4";
-        else if (mimeType.contains(MimeTypes.VIDEO_FLV)) return "FLV";
+        else if (mimeType.contains("audio/av3a")) return "AV3A";
+        else if (mimeType.contains("video/mp4")) return "MP4";
+        else if (mimeType.contains("video/x-flv")) return "FLV";
         else if (mimeType.contains(MimeTypes.VIDEO_AV1)) return "AV1";
         else if (mimeType.contains(MimeTypes.VIDEO_AVI)) return "AVI";
         else if (mimeType.contains(MimeTypes.VIDEO_MPEG)) return "MPEG";

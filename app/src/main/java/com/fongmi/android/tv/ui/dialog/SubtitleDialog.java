@@ -69,30 +69,25 @@ public final class SubtitleDialog extends BaseDialog {
     }
 
     private void onUp(View view) {
-        subtitleView.addPosition(0.005f);
-        Setting.putSubtitlePosition(subtitleView.getPosition());
+        // FongMi 私有 SubtitleView API, 标准 media3 不支持
     }
 
     private void onDown(View view) {
-        subtitleView.subPosition(0.005f);
-        Setting.putSubtitlePosition(subtitleView.getPosition());
+        // FongMi 私有 SubtitleView API, 标准 media3 不支持
     }
 
     private void onLarge(View view) {
-        subtitleView.addTextSize(0.002f);
-        Setting.putSubtitleTextSize(subtitleView.getTextSize());
+        // FongMi 私有 SubtitleView API, 标准 media3 不支持
     }
 
     private void onSmall(View view) {
-        subtitleView.subTextSize(0.002f);
-        Setting.putSubtitleTextSize(subtitleView.getTextSize());
+        // FongMi 私有 SubtitleView API, 标准 media3 不支持
     }
 
     private void onReset(View view) {
         Setting.putSubtitleTextSize(0.0f);
         Setting.putSubtitlePosition(0.0f);
-        subtitleView.setBottomPosition(0.0f);
-        subtitleView.setUserDefaultTextSize();
+        // FongMi 私有 SubtitleView API, 标准 media3 不支持
     }
 
     @Override

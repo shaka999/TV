@@ -59,7 +59,9 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
-        return new NextRenderersFactory(App.get()).setAudioPrefer(Setting.isAudioPrefer()).setVideoPrefer(Setting.isVideoPrefer()).setEnableDecoderFallback(true).setExtensionRendererMode(renderMode);
+        NextRenderersFactory factory = new NextRenderersFactory(App.get());
+        factory.setExtensionRendererMode(renderMode);
+        return factory;
     }
 
     public static MediaSource.Factory buildMediaSourceFactory() {
@@ -96,7 +98,7 @@ public class ExoUtil {
         exo.getSubtitleView().setStyle(getCaptionStyle());
         exo.getSubtitleView().setApplyEmbeddedFontSizes(false);
         exo.getSubtitleView().setApplyEmbeddedStyles(!Setting.isCaption());
-        if (Setting.getSubtitlePosition() != 0) exo.getSubtitleView().setBottomPosition(Setting.getSubtitlePosition());
+        // exo.getSubtitleView().setBottomPosition(...) — FongMi 私有 API
         if (Setting.getSubtitleTextSize() != 0) exo.getSubtitleView().setFractionalTextSize(Setting.getSubtitleTextSize());
     }
 
@@ -109,7 +111,7 @@ public class ExoUtil {
     }
 
     public static String getMimeType(int errorCode) {
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return MimeTypes.APPLICATION_OCTET;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return "application/octet-stream";
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return MimeTypes.APPLICATION_M3U8;
         return null;
     }
@@ -120,10 +122,10 @@ public class ExoUtil {
         builder.setSubtitleConfigurations(getSubtitleConfigs(subs));
         if (drm != null) builder.setDrmConfiguration(drm.get());
         if (mimeType != null) builder.setMimeType(mimeType);
-        builder.setAds(Sniffer.getRegex(uri));
+        // builder.setAds(Sniffer.getRegex(uri)); // FongMi 私有 API
         builder.setMediaId(uri.toString());
-        builder.setImageDurationMs(15000);
-        builder.setDecode(decode);
+        // builder.setImageDurationMs(15000); // FongMi 私有 API
+        // builder.setDecode(decode); // FongMi 私有 API
         return builder.build();
     }
 
