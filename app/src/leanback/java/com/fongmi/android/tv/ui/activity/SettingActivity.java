@@ -3,7 +3,12 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.viewbinding.ViewBinding;
 
@@ -28,6 +33,7 @@ import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.ConfigDialog;
+import com.fongmi.android.tv.ui.dialog.DanmuApiDialog;
 import com.fongmi.android.tv.ui.dialog.DohDialog;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
@@ -50,6 +56,7 @@ import javax.annotation.Nullable;
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback, DohCallback {
 
     private ActivitySettingBinding mBinding;
+    private TextView mDanmuStatus;
     private String[] quality;
     private String[] size;
     private int type;
@@ -86,6 +93,42 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         setCacheText();
         setOtherText();
+        addDanmuRow();
+    }
+
+    private void addDanmuRow() {
+        ViewGroup parent = (ViewGroup) mBinding.player.getParent();
+        if (parent == null) return;
+        int idx = parent.indexOfChild(mBinding.player);
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 24, 0, 24);
+        row.setClickable(true);
+        row.setFocusable(true);
+        row.setBackgroundResource(android.R.drawable.list_selector_background);
+        row.setOnClickListener(v -> new DanmuApiDialog(this, this::updateDanmuStatus).show());
+        TextView label = new TextView(this);
+        label.setText("弹幕设置");
+        label.setTextSize(15);
+        label.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        row.addView(label);
+        mDanmuStatus = new TextView(this);
+        mDanmuStatus.setTextSize(13);
+        mDanmuStatus.setGravity(Gravity.END);
+        updateDanmuStatus();
+        row.addView(mDanmuStatus);
+        parent.addView(row, idx + 1);
+    }
+
+    private void updateDanmuStatus() {
+        if (mDanmuStatus == null) return;
+        if (!Setting.isDanmuApiEnabled() || TextUtils.isEmpty(Setting.getDanmuApi())) {
+            mDanmuStatus.setText("未配置");
+            mDanmuStatus.setTextColor(0xFF888888);
+        } else {
+            mDanmuStatus.setText("已启用");
+            mDanmuStatus.setTextColor(0xFF639922);
+        }
     }
 
     private void setOtherText() {

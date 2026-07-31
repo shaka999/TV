@@ -19,7 +19,6 @@ public class DanmuApiDialog {
     private Switch danmakuLoadSwitch;
     private Switch enabledSwitch;
     private Switch autoSwitch;
-    private Switch crawlerSwitch;
     private EditText urlInput;
 
     public DanmuApiDialog(Context context, Runnable onDismiss) {
@@ -46,13 +45,10 @@ public class DanmuApiDialog {
         urlInput.setEnabled(Setting.isDanmuApiEnabled());
         autoSwitch = addSwitchRow(context, root, "自动获取弹幕", Setting.isDanmuApiAuto());
         autoSwitch.setEnabled(Setting.isDanmuApiEnabled());
-        crawlerSwitch = addSwitchRow(context, root, "爬虫模式（多平台聚合）", Setting.isDanmuApiCrawler());
-        crawlerSwitch.setEnabled(Setting.isDanmuApiEnabled());
 
         enabledSwitch.setOnCheckedChangeListener((button, checked) -> {
             urlInput.setEnabled(checked);
             autoSwitch.setEnabled(checked);
-            crawlerSwitch.setEnabled(checked);
             if (checked && TextUtils.isEmpty(urlInput.getText())) urlInput.requestFocus();
         });
 
@@ -104,7 +100,6 @@ public class DanmuApiDialog {
         Setting.putDanmuApi(url);
         Setting.putDanmuApiEnabled(enabledSwitch.isChecked() && !TextUtils.isEmpty(url));
         Setting.putDanmuApiAuto(autoSwitch.isChecked());
-        Setting.putDanmuApiCrawler(crawlerSwitch.isChecked());
     }
 
     public void show() {

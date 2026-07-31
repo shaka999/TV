@@ -50,19 +50,12 @@ public class DanmuApi {
             return;
         }
         loading = true;
-        final boolean crawler = Setting.isDanmuApiCrawler();
         App.execute(() -> {
             try {
-                String url = apiUrl.replaceAll("/+$", "") + "/api/v2/fongmi/danmaku?name=" + URLEncoder.encode(name, "UTF-8") + "&episode=" + URLEncoder.encode(episode != null ? episode : "", "UTF-8");
+                String url = apiUrl.replaceAll("/+$", "") + "/api/v2/fongmi/danmaku?name=" + URLEncoder.encode(name != null ? name : "", "UTF-8") + "&episode=" + URLEncoder.encode(episode != null ? episode : "", "UTF-8");
                 String json = OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_DANMAKU), url, "danmu_api").execute().body().string();
                 List<Danmaku> result = App.gson().fromJson(json, new TypeToken<List<Danmaku>>() {}.getType());
-                final List<Danmaku> items = new ArrayList<>();
-                if (result != null) {
-                    for (Danmaku item : result) {
-                        if (crawler) item.setName("[聚合] " + item.getName());
-                        items.add(item);
-                    }
-                }
+                final List<Danmaku> items = result != null ? result : new ArrayList<Danmaku>();
                 App.post(() -> {
                     loading = false;
                     callback.onResult(items);

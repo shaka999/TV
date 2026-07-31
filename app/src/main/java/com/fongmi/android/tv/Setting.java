@@ -273,14 +273,6 @@ public class Setting {
         Prefers.put("danmu_api_auto", auto);
     }
 
-    public static boolean isDanmuApiCrawler() {
-        return Prefers.getBoolean("danmu_api_crawler");
-    }
-
-    public static void putDanmuApiCrawler(boolean crawler) {
-        Prefers.put("danmu_api_crawler", crawler);
-    }
-
     public static boolean isZhuyin() {
         return Prefers.getBoolean("zhuyin");
     }

@@ -636,6 +636,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void start(Channel result) {
+        mPlayers.setVideoName(result.getName());
         mPlayers.start(result, getTimeout());
     }
 

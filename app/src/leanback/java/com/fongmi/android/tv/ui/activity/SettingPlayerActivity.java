@@ -15,7 +15,6 @@ import com.fongmi.android.tv.impl.SpeedCallback;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuApiDialog;
 import com.fongmi.android.tv.ui.dialog.SpeedDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -56,7 +55,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.backgroundText.setText(getSwitch(Setting.isBackgroundOn()));
         mBinding.audioDecodeText.setText(getSwitch(Setting.isAudioPrefer()));
         mBinding.videoDecodeText.setText(getSwitch(Setting.isVideoPrefer()));
-        mBinding.danmakuLoadText.setText(Setting.isDanmuApiEnabled() ? "已启用" : getSwitch(Setting.isDanmakuLoad()));
+        mBinding.danmakuLoadText.setText(getSwitch(Setting.isDanmakuLoad()));
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
@@ -76,7 +75,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.audioDecode.setOnClickListener(this::setAudioDecode);
         mBinding.videoDecode.setOnClickListener(this::setVideoDecode);
-        mBinding.danmakuLoad.setOnClickListener(this::onDanmakuSettings);
+        mBinding.danmakuLoad.setOnClickListener(this::setDanmakuLoad);
     }
 
     private void setVisible() {
@@ -158,12 +157,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.videoDecodeText.setText(getSwitch(Setting.isVideoPrefer()));
     }
 
-    private void onDanmakuSettings(View view) {
-        new DanmuApiDialog(this, this::refreshDanmakuStatus).show();
-    }
-
-    private void refreshDanmakuStatus() {
-        mBinding.danmakuLoadText.setText(Setting.isDanmuApiEnabled() ? "已启用" : getSwitch(Setting.isDanmakuLoad()));
+    private void setDanmakuLoad(View view) {
+        Setting.putDanmakuLoad(!Setting.isDanmakuLoad());
+        mBinding.danmakuLoadText.setText(getSwitch(Setting.isDanmakuLoad()));
     }
 
     private void onBackground(View view) {
