@@ -46,6 +46,12 @@ public class SettingDanmuActivity extends BaseActivity {
         mBinding.danmuApiEnabled.setOnClickListener(this::setDanmuApiEnabled);
         mBinding.danmuApiAuto.setOnClickListener(this::setDanmuApiAuto);
 
+        // 点击输入框所在行：聚焦 EditText 并弹输入法（遥控器选中行时的兜底）
+        mBinding.danmuApiUrl.setOnClickListener(v -> {
+            mBinding.danmuApiUrlEdit.requestFocus();
+            mImm.showSoftInput(mBinding.danmuApiUrlEdit, InputMethodManager.SHOW_IMPLICIT);
+        });
+
         // 内联输入框：获得焦点时弹出TV输入法，失焦收起；输入即时保存
         mBinding.danmuApiUrlEdit.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
@@ -83,6 +89,11 @@ public class SettingDanmuActivity extends BaseActivity {
             if (enabled) {
                 mBinding.danmuApiUrlEdit.setText(Setting.getDanmuApi());
                 mBinding.danmuApiAutoText.setText(getSwitch(Setting.isDanmuApiAuto()));
+                // 重新进入/级联显示后主动聚焦输入框并弹输入法，确保遥控器可选中输入
+                mBinding.danmuApiUrlEdit.post(() -> {
+                    mBinding.danmuApiUrlEdit.requestFocus();
+                    mImm.showSoftInput(mBinding.danmuApiUrlEdit, InputMethodManager.SHOW_IMPLICIT);
+                });
             }
         }
     }
@@ -99,12 +110,8 @@ public class SettingDanmuActivity extends BaseActivity {
     private void setDanmuApiEnabled(View view) {
         boolean willEnable = !Setting.isDanmuApiEnabled();
         Setting.putDanmuApiEnabled(willEnable);
+        // 聚焦逻辑统一在 refreshAll 中处理（开启后主动聚焦输入框并弹输入法）
         refreshAll();
-        // 打开外部API后直接聚焦内联输入框并弹出输入法，无需弹窗
-        if (willEnable) {
-            mBinding.danmuApiUrlEdit.requestFocus();
-            mImm.showSoftInput(mBinding.danmuApiUrlEdit, InputMethodManager.SHOW_IMPLICIT);
-        }
     }
 
     private void setDanmuApiAuto(View view) {
