@@ -32,7 +32,6 @@ import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.ConfigDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuApiDialog;
 import com.fongmi.android.tv.ui.dialog.DohDialog;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
@@ -108,7 +107,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         row.setClickable(true);
         row.setFocusable(true);
         row.setFocusableInTouchMode(true);
-        row.setOnClickListener(v -> new DanmuApiDialog(this, this::updateDanmuStatus).show());
+        row.setOnClickListener(v -> SettingDanmuActivity.start(this));
         TextView label = new TextView(this);
         label.setText(R.string.danmaku_setting);
         label.setTextColor(ResUtil.getColor(R.color.white));
@@ -402,6 +401,12 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 Notify.show(R.string.restore_fail);
             }
         }));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateDanmuStatus();
     }
 
     private void initConfig() {

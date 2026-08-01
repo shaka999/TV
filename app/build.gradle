@@ -17,8 +17,8 @@ android {
         // 版本号迭代规范: versionCode = FongMi基线(407) * 100 + fork修订号
         //   每次 bug 修复递增修订号(+1), 例: 4.0.7.1 => 40701, 4.0.7.2 => 40702
         //   版本名保持 "4.0.7.{n}" 以表明基于 FongMi 4.0.7 fork
-        versionCode 40702
-        versionName "4.0.7.2"
+        versionCode 40703
+        versionName "4.0.7.3"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
@@ -60,6 +60,8 @@ android {
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 

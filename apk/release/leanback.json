@@ -1,5 +1,5 @@
 {
-  "name": "4.0.7.1",
-  "code": 40701,
-  "desc": "FongMi TV 4.0.7 fork 累积修复版：直播HLS崩溃修复、无画面修复、API23兼容、直链弹幕自动加载、弹幕设置UI统一"
+  "name": "4.0.7.3",
+  "code": 40703,
+  "desc": "FongMi TV 4.0.7 fork 累积修复版：视频画面恢复(surface_type)、弹幕设置全屏Activity、启用外部API时弹出URL输入框、签名v1+v2兼容"
 }
