@@ -1,5 +1,5 @@
 {
-  "name": "4.0.7.3",
-  "code": 40703,
-  "desc": "FongMi TV 4.0.7 fork 累积修复版：视频画面恢复(surface_type)、弹幕设置全屏Activity、启用外部API时弹出URL输入框、签名v1+v2兼容"
+  "name": "4.0.7.4",
+  "code": 40704,
+  "desc": "FongMi TV 4.0.7 fork 累积修复版：修复弹幕设置Activity未注册导致的打开报错"
 }
