@@ -47,6 +47,10 @@ public class DanmuApiDialog {
     }
 
     private void initEvent() {
+        binding.rowDanmakuLoad.setOnClickListener(v -> binding.switchDanmakuLoad.toggle());
+        binding.rowEnabled.setOnClickListener(v -> binding.switchEnabled.toggle());
+        binding.rowAuto.setOnClickListener(v -> binding.switchAuto.toggle());
+
         binding.switchEnabled.setOnCheckedChangeListener((button, checked) -> {
             binding.editUrl.setEnabled(checked);
             binding.switchAuto.setEnabled(checked);

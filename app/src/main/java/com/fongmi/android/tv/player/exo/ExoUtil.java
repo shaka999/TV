@@ -16,6 +16,7 @@ import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.LoadControl;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
@@ -34,8 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 public class ExoUtil {
 
@@ -59,7 +58,7 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
-        NextRenderersFactory factory = new NextRenderersFactory(App.get());
+        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get());
         factory.setEnableDecoderFallback(true);
         factory.setExtensionRendererMode(renderMode);
         return factory;

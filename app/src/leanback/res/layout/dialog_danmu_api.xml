@@ -4,22 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
     <LinearLayout
         android:id="@+id/rowDanmakuLoad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_item"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:clickable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="8dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:text="@string/danmaku_load"
             android:textColor="@color/white"
@@ -28,7 +28,8 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchDanmakuLoad"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:nextFocusDown="@id/switchEnabled" />
 
     </LinearLayout>
 
@@ -43,15 +44,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_item"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:clickable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="8dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:text="@string/danmaku_api_enable"
             android:textColor="@color/white"
@@ -60,7 +61,8 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchEnabled"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:nextFocusDown="@id/editUrl" />
 
     </LinearLayout>
 
@@ -69,10 +71,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_item"
-        android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="8dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -90,6 +91,7 @@
             android:imeOptions="actionDone"
             android:importantForAutofill="no"
             android:inputType="textUri"
+            android:nextFocusDown="@id/switchAuto"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white_40"
@@ -102,15 +104,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_item"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:clickable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="8dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:text="@string/danmaku_api_auto"
             android:textColor="@color/white"
@@ -119,7 +121,8 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switchAuto"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:nextFocusDown="@id/positive" />
 
     </LinearLayout>
 

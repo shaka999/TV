@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -106,19 +105,18 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         lp.topMargin = ResUtil.dp2px(16);
         row.setLayoutParams(lp);
         row.setBackgroundResource(R.drawable.selector_item);
+        row.setClickable(true);
         row.setFocusable(true);
         row.setFocusableInTouchMode(true);
-        row.setPadding(0, 8, 0, 8);
         row.setOnClickListener(v -> new DanmuApiDialog(this, this::updateDanmuStatus).show());
         TextView label = new TextView(this);
         label.setText(R.string.danmaku_setting);
         label.setTextColor(ResUtil.getColor(R.color.white));
         label.setTextSize(18);
-        label.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         row.addView(label);
         mDanmuStatus = new TextView(this);
-        mDanmuStatus.setTextSize(14);
-        mDanmuStatus.setGravity(Gravity.END);
+        mDanmuStatus.setTextSize(18);
+        mDanmuStatus.setTextColor(ResUtil.getColor(R.color.grey_700));
         updateDanmuStatus();
         row.addView(mDanmuStatus);
         parent.addView(row, idx + 1);
@@ -128,7 +126,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         if (mDanmuStatus == null) return;
         if (!Setting.isDanmuApiEnabled() || TextUtils.isEmpty(Setting.getDanmuApi())) {
             mDanmuStatus.setText(R.string.danmaku_setting_unconfigured);
-            mDanmuStatus.setTextColor(ResUtil.getColor(R.color.white_60));
+            mDanmuStatus.setTextColor(ResUtil.getColor(R.color.grey_700));
         } else {
             mDanmuStatus.setText(R.string.danmaku_setting_enabled);
             mDanmuStatus.setTextColor(ResUtil.getColor(R.color.white));
