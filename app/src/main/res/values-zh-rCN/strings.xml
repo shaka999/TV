@@ -60,6 +60,7 @@
     <string name="danmaku_load">弹幕加载</string>
     <string name="danmaku_api_enable">启用外部弹幕API</string>
     <string name="danmaku_api_url">API地址</string>
+    <string name="danmaku_api_url_hint">http://192.168.1.7:9321</string>
     <string name="danmaku_api_auto">自动获取弹幕</string>
     <string name="danmaku_setting">弹幕设置</string>
     <string name="danmaku_setting_unconfigured">未配置</string>

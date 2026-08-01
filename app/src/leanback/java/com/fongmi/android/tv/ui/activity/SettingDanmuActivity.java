@@ -1,23 +1,24 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.EditText;
+import android.view.inputmethod.InputMethodManager;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.ActivitySettingDanmuBinding;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.utils.ResUtil;
 
 public class SettingDanmuActivity extends BaseActivity {
 
     private ActivitySettingDanmuBinding mBinding;
+    private InputMethodManager mImm;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingDanmuActivity.class));
@@ -34,70 +35,76 @@ public class SettingDanmuActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mBinding.danmakuLoad.requestFocus();
-        mBinding.danmakuLoadText.setText(getSwitch(Setting.isDanmakuLoad()));
-        mBinding.danmuApiEnabledText.setText(getSwitch(Setting.isDanmuApiEnabled()));
-        mBinding.danmuApiUrlText.setText(Setting.getDanmuApi());
-        mBinding.danmuApiAutoText.setText(getSwitch(Setting.isDanmuApiAuto()));
-        updateApiVisibility();
+        refreshAll();
     }
 
     @Override
     protected void initEvent() {
         mBinding.danmakuLoad.setOnClickListener(this::setDanmakuLoad);
         mBinding.danmuApiEnabled.setOnClickListener(this::setDanmuApiEnabled);
-        mBinding.danmuApiUrl.setOnClickListener(this::onDanmuApiUrl);
         mBinding.danmuApiAuto.setOnClickListener(this::setDanmuApiAuto);
+
+        // 内联输入框：获得焦点时弹出TV输入法，失焦收起；输入即时保存
+        mBinding.danmuApiUrlEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                mImm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            } else {
+                mImm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            }
+        });
+        mBinding.danmuApiUrlEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Setting.putDanmuApi(s.toString().trim());
+            }
+        });
     }
 
-    private void updateApiVisibility() {
-        boolean enabled = Setting.isDanmuApiEnabled();
-        mBinding.danmuApiUrl.setVisibility(enabled ? View.VISIBLE : View.GONE);
-        mBinding.danmuApiAuto.setVisibility(enabled ? View.VISIBLE : View.GONE);
+    // 级联刷新：弹幕加载 -> 启用外部API -> 地址输入框 + 自动获取
+    private void refreshAll() {
+        boolean load = Setting.isDanmakuLoad();
+        mBinding.danmakuLoadText.setText(getSwitch(load));
+        mBinding.danmuApiEnabled.setVisibility(load ? View.VISIBLE : View.GONE);
+        if (load) {
+            boolean enabled = Setting.isDanmuApiEnabled();
+            mBinding.danmuApiEnabledText.setText(getSwitch(enabled));
+            mBinding.danmuApiUrl.setVisibility(enabled ? View.VISIBLE : View.GONE);
+            mBinding.danmuApiAuto.setVisibility(enabled ? View.VISIBLE : View.GONE);
+            if (enabled) {
+                mBinding.danmuApiUrlEdit.setText(Setting.getDanmuApi());
+                mBinding.danmuApiAutoText.setText(getSwitch(Setting.isDanmuApiAuto()));
+            }
+        }
     }
 
     private void setDanmakuLoad(View view) {
         Setting.putDanmakuLoad(!Setting.isDanmakuLoad());
-        mBinding.danmakuLoadText.setText(getSwitch(Setting.isDanmakuLoad()));
+        // 关闭弹幕加载时收起输入法并隐藏下方所有子项
+        if (!Setting.isDanmakuLoad()) {
+            mImm.hideSoftInputFromWindow(mBinding.danmuApiUrlEdit.getWindowToken(), 0);
+        }
+        refreshAll();
     }
 
     private void setDanmuApiEnabled(View view) {
         boolean willEnable = !Setting.isDanmuApiEnabled();
+        Setting.putDanmuApiEnabled(willEnable);
+        refreshAll();
+        // 打开外部API后直接聚焦内联输入框并弹出输入法，无需弹窗
         if (willEnable) {
-            // 启用时弹出输入框让用户填写API地址
-            showApiUrlDialog(willEnable);
-        } else {
-            Setting.putDanmuApiEnabled(false);
-            mBinding.danmuApiEnabledText.setText(getSwitch(false));
-            updateApiVisibility();
+            mBinding.danmuApiUrlEdit.requestFocus();
+            mImm.showSoftInput(mBinding.danmuApiUrlEdit, InputMethodManager.SHOW_IMPLICIT);
         }
-    }
-
-    private void onDanmuApiUrl(View view) {
-        showApiUrlDialog(Setting.isDanmuApiEnabled());
-    }
-
-    private void showApiUrlDialog(boolean keepEnabled) {
-        EditText editText = new EditText(this);
-        editText.setText(Setting.getDanmuApi());
-        editText.setHint("http://192.168.1.7:9321");
-        editText.setSingleLine(true);
-        editText.setTextColor(ResUtil.getColor(R.color.white));
-        editText.setBackgroundColor(ResUtil.getColor(R.color.transparent));
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.danmaku_api_url))
-                .setView(editText)
-                .setPositiveButton(getString(R.string.dialog_positive), (dialog, which) -> {
-                    String url = editText.getText().toString().trim();
-                    Setting.putDanmuApi(url);
-                    boolean enabled = keepEnabled && !TextUtils.isEmpty(url);
-                    Setting.putDanmuApiEnabled(enabled);
-                    mBinding.danmuApiEnabledText.setText(getSwitch(enabled));
-                    mBinding.danmuApiUrlText.setText(url);
-                    updateApiVisibility();
-                })
-                .setNegativeButton(getString(R.string.dialog_negative), null)
-                .show();
     }
 
     private void setDanmuApiAuto(View view) {

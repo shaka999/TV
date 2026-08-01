@@ -1,5 +1,5 @@
 {
-  "name": "4.0.7.4",
-  "code": 40704,
-  "desc": "FongMi TV 4.0.7 fork 开发版：修复弹幕设置Activity未注册导致的打开报错"
+  "name": "4.0.7.5",
+  "code": 40705,
+  "desc": "FongMi TV 4.0.7 fork 开发版：弹幕设置级联显示(加载→外部API→内联输入框)，修复输入框TV打字不显示"
 }
