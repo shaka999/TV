@@ -79,9 +79,6 @@ jobs:
         with:
           gradle-version: '8.13'
       - run: |
-          # 用同批产出的定制 lib-common aar 作为 stub 编译期类路径（保证 Player 方法集一致）
-          mkdir -p tv/.fongmi6/patches/mpv-stub/libs
-          cp /tmp/aars/lib-common-release.aar tv/.fongmi6/patches/mpv-stub/libs/
           cd tv/.fongmi6/patches/mpv-stub
           gradle assembleRelease --no-daemon --stacktrace
           cp build/outputs/aar/*.aar /tmp/aars/mpvplayer-stub-release.aar
@@ -102,10 +99,6 @@ jobs:
           files: /tmp/aars/*.aar
 
       - name: 自动触发 TV 主构建（出 APK）
-        # 本 workflow 的 checkout 都在子目录（media/、tv/），工作区根目录不是 git 仓库，
-        # gh 需要 cd 到含 .git 的 tv/ 下才能定位仓库。
-        run: |
-          cd tv
-          gh workflow run build-tv.yml --ref fongmi-6
+        run: gh workflow run build-tv.yml --ref fongmi-6 -R ${{ github.repository }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
