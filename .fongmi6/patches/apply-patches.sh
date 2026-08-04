@@ -34,8 +34,7 @@ rm -f app/src/main/java/com/fongmi/android/tv/api/loader/PyLoader.java
 sed -i '/private final PyLoader pyLoader;/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/pyLoader = new PyLoader();/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/pyLoader.clear();/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-# getSpider() 的 if 是 if/else-if 链首行，直接删除会留 dangling else → 改为等价 no-op 保住链结构
-sed -i 's|if (isPy(api)) return pyLoader.getSpider.*|if (false) return null;|' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
+sed -i '/if (isPy(api)) return pyLoader.getSpider/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/else if (isPy(api)) pyLoader.setRecent/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/if ("py".equals(params.get("do"))) return pyLoader.proxy(params);/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 
@@ -50,6 +49,17 @@ if ! grep -q 'tools:overrideLibrary' "$MANIFEST"; then
 fi
 
 echo "==> [5/6] （MPV 空实现 aar 与定制 media3 aar 由 fetch-media3.sh 放入 app/libs）"
+echo "==> [5.5/6] HTML 兼容补丁：Html.fromHtml(X, int flags) -> Html.fromHtml(X)"
+echo "    API 24+ 才有的 fromHtml(String, int flags)，6.0.1（API 23）只有废弃的单参版本，会 NoSuchMethodError"
+echo "    涉及文件：Vod.java（点播片名解析）、Util.java（通用 HTML 处理）"
+for f in app/src/main/java/com/fongmi/android/tv/bean/Vod.java \
+         app/src/main/java/com/fongmi/android/tv/utils/Util.java; do
+    [ -f "$f" ] || continue
+    if grep -q 'Html\.fromHtml([^)]*,[^)]*)' "$f"; then
+        sed -i -E 's/Html\.fromHtml\(([^,]+), [^)]+\)/Html.fromHtml(\1)/g' "$f"
+        echo "    ✓ 修正: $f"
+    fi
+done
 
 echo "==> [6/6] 校验改动"
 echo "--- settings.gradle includes:"
@@ -64,6 +74,8 @@ echo "--- PyLoader 残留:"
 ls app/src/main/java/com/fongmi/android/tv/api/loader/PyLoader.java 2>/dev/null && echo "!! PyLoader 未删除" || echo "OK PyLoader 已移除"
 echo "--- BaseLoader 残留 pyLoader（应为空）:"
 grep -n 'pyLoader' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java 2>/dev/null || echo "OK 无残留"
+echo "--- HTML fromHtml 残留 2 参（应为空）:"
+grep -rn 'Html\.fromHtml([^)]*,[^)]*)' app/src/main/java/ 2>/dev/null || echo "OK 无残留"
 
 echo ""
 echo "✅ 构建层补丁应用完成。下一步：bash .fongmi6/scripts/fetch-media3.sh 拉 aar，然后 ./gradlew assemble"
