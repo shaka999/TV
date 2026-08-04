@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   build:
@@ -95,3 +96,8 @@ jobs:
             供 fongmi-6 分支 build-tv workflow 下载到 app/libs 使用。
             注意：decoder_ffmpeg 默认只含 Java 部分（无 FFmpeg native），软解需额外编译。
           files: /tmp/aars/*.aar
+
+      - name: 自动触发 TV 主构建（出 APK）
+        run: gh workflow run build-tv.yml --ref fongmi-6
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
