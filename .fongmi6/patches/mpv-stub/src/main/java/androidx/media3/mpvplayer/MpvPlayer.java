@@ -138,6 +138,7 @@ public final class MpvPlayer implements Player {
   public void seekToNextMediaItem() {}
   public void seekToNext() {}
   public void setPlaybackParameters(PlaybackParameters playbackParameters) {}
+  public void setPlaybackSpeed(float speed) {}
   public PlaybackParameters getPlaybackParameters() { return null; }
   public void stop() {}
   public void release() {}
