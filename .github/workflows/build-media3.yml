@@ -62,9 +62,10 @@ jobs:
           # 通用软解解码器集合（音频 + 视频，覆盖主流格式）
           ENABLED_DECODERS=(aac ac3 eac3 mp3 vorbis opus flac pcm_alaw pcm_mulaw pcm_s16le \
                             h264 hevc mpeg2video mpeg4 vp8 vp9 av1 wmav2 mjpeg)
-          # 先编 armv7（ABI 23），再编 arm64（ABI 26），每个约 5-10 分钟
-          ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 23 "${ENABLED_DECODERS[@]}" 2>&1 | tail -3
-          ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 26 "${ENABLED_DECODERS[@]}" 2>&1 | tail -3
+          # ABI 参数必须用 21（build_ffmpeg.sh 按 ABI 拼 clang 名：armv7a-linux-androideabi{ABI}-clang，
+          # NDK 只有 -21-clang；官方 README 亦说明 ANDROID_ABI<21 时用 r23c，arm64 会自动升到 21）
+          # 脚本一次运行会同时编 armeabi-v7a 与 arm64-v8a 两架构（内部两次 configure+make）
+          ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 21 "${ENABLED_DECODERS[@]}" 2>&1 | tail -8
           echo "=== android-libs 产出 ==="
           ls "${FFMPEG_MODULE_PATH}/jni/ffmpeg/android-libs/" 2>/dev/null || { echo "!! android-libs 未生成"; exit 1; }
 
