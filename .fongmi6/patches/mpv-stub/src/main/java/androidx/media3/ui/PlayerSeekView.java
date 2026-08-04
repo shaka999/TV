@@ -6,6 +6,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.Player;
+import androidx.media3.ui.DefaultTimeBar;
 import androidx.media3.ui.TimeBar;
 
 /**
@@ -32,7 +33,7 @@ public class PlayerSeekView extends FrameLayout implements Player.Listener {
 
     public PlayerSeekView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        timeBar = new TimeBar(context, attrs);
+        timeBar = new DefaultTimeBar(context, attrs);
         // 与上游 PlaybackActivity findViewById(androidx.media3.ui.R.id.exo_progress) 对应
         timeBar.setId(androidx.media3.ui.R.id.exo_progress);
         addView(timeBar, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
