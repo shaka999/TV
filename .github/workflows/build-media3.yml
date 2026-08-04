@@ -57,6 +57,7 @@ jobs:
             :lib-exoplayer-rtsp:assembleRelease \
             :lib-exoplayer-smoothstreaming:assembleRelease \
             :lib-datasource:assembleRelease \
+            :lib-datasource-okhttp:assembleRelease \
             :lib-database:assembleRelease \
             :lib-decoder:assembleRelease \
             :lib-decoder-ffmpeg:assembleRelease \
@@ -80,6 +81,10 @@ jobs:
           gradle-version: '8.13'
       - run: |
           cd tv/.fongmi6/patches/mpv-stub
+          # stub 编译需要定制 media3 的 compileOnly 类型（PlayerSeekView/DecodeTrackSelector 等用到 lib-ui/exoplayer/datasource）
+          mkdir -p libs
+          cp /tmp/aars/lib-common-release.aar /tmp/aars/lib-exoplayer-release.aar \
+             /tmp/aars/lib-datasource-release.aar /tmp/aars/lib-ui-release.aar libs/
           gradle assembleRelease --no-daemon --stacktrace
           cp build/outputs/aar/*.aar /tmp/aars/mpvplayer-stub-release.aar
 
