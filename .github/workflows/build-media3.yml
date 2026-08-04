@@ -38,12 +38,33 @@ jobs:
       - name: 安装 Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: 补装 SDK Platform 36
+      - name: 补装 SDK Platform 36 + NDK + CMake（FFmpeg native 软解）
         run: |
           yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" >/dev/null 2>&1 || true
-          # 注：decoder_ffmpeg 的 FFmpeg native 需额外步骤（见 README），默认只编 Java 部分
-          # 如需软解 FFmpeg native，取消下行注释并配置 NDK + 拉取 FongMi/FFmpeg 到 src/main/jni/ffmpeg/
-          # yes | sdkmanager "ndk;27.2.12479018" "cmake;3.22.1" >/dev/null 2>&1 || true
+          # FFmpeg 软解 native 依赖：NDK（官方 README 测试过 r26b）+ CMake 3.21+
+          yes | sdkmanager "ndk;26.3.11579264" "cmake;3.22.1" >/dev/null 2>&1 || true
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME"
+
+      - name: 构建 FFmpeg native（软解，armeabi-v7a + arm64-v8a）
+        # 按官方 decoder_ffmpeg README：clone FFmpeg release/6.0 → build_ffmpeg.sh 编静态库 → gradle 自动链接
+        # 全量 FFmpeg 仓库很大，用 --depth=1 只拉 6.0 分支
+        run: |
+          FFMPEG_MODULE_PATH="$(pwd)/media/libraries/decoder_ffmpeg/src/main"
+          cd "${FFMPEG_MODULE_PATH}/jni"
+          git clone --depth=1 --branch=release/6.0 https://github.com/FongMi/FFmpeg.git ffmpeg 2>&1 | tail -2
+          ls ffmpeg/ | head -5
+          echo "FFmpeg 源码就绪"
+          NDK_PATH="$ANDROID_NDK_HOME"
+          echo "NDK: $NDK_PATH"
+          chmod +x build_ffmpeg.sh
+          # 通用软解解码器集合（音频 + 视频，覆盖主流格式）
+          ENABLED_DECODERS=(aac ac3 eac3 mp3 vorbis opus flac pcm_alaw pcm_mulaw pcm_s16le \
+                            h264 hevc mpeg2video mpeg4 vp8 vp9 av1 wmav2 mjpeg)
+          # 先编 armv7，再编 arm64（每个约 5-10 分钟）
+          ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 23 "${ENABLED_DECODERS[@]}" 2>&1 | tail -3
+          ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 26 "${ENABLED_DECODERS[@]}" 2>&1 | tail -3
+          echo "=== android-libs 产出 ==="
+          ls "${FFMPEG_MODULE_PATH}/jni/ffmpeg/android-libs/" 2>/dev/null || echo "!! android-libs 未生成"
 
       - name: 打补丁：补齐 FongMi 私有 media3 API（C/CaptionStyleCompat/SubtitleView/PlayerView/ExoPlayer/DefaultRenderersFactory）
         run: |
@@ -105,7 +126,7 @@ jobs:
           body: |
             FongMi 定制 media3 (release-1.10.1-fongmi) + MPV 空实现 stub 的自编译 aar。
             供 fongmi-6 分支 build-tv workflow 下载到 app/libs 使用。
-            注意：decoder_ffmpeg 默认只含 Java 部分（无 FFmpeg native），软解需额外编译。
+            包含 FFmpeg native 软解（armeabi-v7a + arm64-v8a，H.264/HEVC/MP3/AAC 等）。
           files: /tmp/aars/*.aar
 
       - name: 自动触发 TV 主构建（出 APK）
