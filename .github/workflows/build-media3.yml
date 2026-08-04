@@ -50,27 +50,28 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew \
-            :libraries:common:release \
-            :libraries:exoplayer:release \
-            :libraries:exoplayer_hls:release \
-            :libraries:exoplayer_dash:release \
-            :libraries:exoplayer_rtsp:release \
-            :libraries:exoplayer_smoothstreaming:release \
-            :libraries:datasource:release \
-            :libraries:database:release \
-            :libraries:decoder:release \
-            :libraries:decoder_ffmpeg:release \
-            :libraries:extractor:release \
-            :libraries:effect:release \
-            :libraries:session:release \
-            :libraries:ui:release \
-            :libraries:ui_danmaku:release \
+            :lib-common:release \
+            :lib-exoplayer:release \
+            :lib-exoplayer-hls:release \
+            :lib-exoplayer-dash:release \
+            :lib-exoplayer-rtsp:release \
+            :lib-exoplayer-smoothstreaming:release \
+            :lib-datasource:release \
+            :lib-database:release \
+            :lib-decoder:release \
+            :lib-decoder-ffmpeg:release \
+            :lib-extractor:release \
+            :lib-effect:release \
+            :lib-session:release \
+            :lib-ui:release \
+            :lib-ui-danmaku:release \
             --no-daemon -x lint -x test -x javadoc
 
       - name: 收集 media3 aar
         run: |
           mkdir -p /tmp/aars
-          find media/libraries -path '*/build/outputs/aar/*-release.aar' -exec cp {} /tmp/aars/ \;
+          # 注意：media 仓库 gradle.properties 设了 buildDir=buildout，输出在 buildout/outputs/aar
+          find media/libraries -path '*/outputs/aar/*-release.aar' -exec cp {} /tmp/aars/ \;
           echo "media3 aar 数量: $(ls /tmp/aars/*.aar 2>/dev/null | wc -l)"
 
       - name: 编译 MPV 空实现 stub
