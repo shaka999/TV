@@ -21,7 +21,7 @@ shaka999/TV · fongmi-4.0.7 ◄── 回退安全网（保留不动）
 
 ## 构建层 5 项改动（apply-patches.sh，幂等）
 1. **移除 chaquopy**：settings.gradle / 根 build.gradle / app/build.gradle / toml 四处删 chaquo 引用
-2. **移除 PyLoader（chaquopy 副产物）**：删 `PyLoader.java` + BaseLoader.java 里 6 处 pyLoader 引用（`.py` 解析源自动降级为不可用，返回空 Spider，不崩）
+2. **移除 PyLoader（chaquopy 副产物）**：删 `PyLoader.java` + BaseLoader.java 里 6 处 pyLoader 引用（getSpider 链首行改写为 `if (false)` 保住 else-if 结构；`.py` 解析源自动降级为不可用，返回空 Spider，不崩）
 3. **minSdk 24 → 23**：toml 一行
 4. **overrideLibrary**：manifest 注入，压制私有 aar（forcetech/hook/thunder/tvbus/jianpian 等）的 minSdk 24 冲突
 5. **自编译 media3 aar**：CI 编 `FongMi/media` 定制分支，产出 lib 放 app/libs

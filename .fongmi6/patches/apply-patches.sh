@@ -34,7 +34,8 @@ rm -f app/src/main/java/com/fongmi/android/tv/api/loader/PyLoader.java
 sed -i '/private final PyLoader pyLoader;/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/pyLoader = new PyLoader();/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/pyLoader.clear();/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-sed -i '/if (isPy(api)) return pyLoader.getSpider/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
+# getSpider() 的 if 是 if/else-if 链首行，直接删除会留 dangling else → 改为等价 no-op 保住链结构
+sed -i 's|if (isPy(api)) return pyLoader.getSpider.*|if (false) return null;|' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/else if (isPy(api)) pyLoader.setRecent/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 sed -i '/if ("py".equals(params.get("do"))) return pyLoader.proxy(params);/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
 
