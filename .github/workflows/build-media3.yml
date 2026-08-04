@@ -65,7 +65,7 @@ jobs:
             :lib-session:assembleRelease \
             :lib-ui:assembleRelease \
             :lib-ui-danmaku:assembleRelease \
-            --no-daemon -x lint -x test -x javadoc
+            --no-daemon -x lint -x test
 
       - name: 收集 media3 aar
         run: |
