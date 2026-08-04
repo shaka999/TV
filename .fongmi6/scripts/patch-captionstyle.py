@@ -32,6 +32,7 @@ if 'this.edgeWidth = 0' not in src:
 eight = '''
   /**
    * 8-argument constructor required by FongMi TV app (SubtitleSetting.getStyle).
+   * 直接全字段赋值（不能委托 6 参构造，否则 final 字段 edgeWidth/shadow 二次赋值）。
    */
   public CaptionStyleCompat(
       int foregroundColor,
@@ -42,7 +43,12 @@ eight = '''
       @Nullable Typeface typeface,
       float edgeWidth,
       float shadow) {
-    this(foregroundColor, backgroundColor, windowColor, edgeType, edgeColor, typeface);
+    this.foregroundColor = foregroundColor;
+    this.backgroundColor = backgroundColor;
+    this.windowColor = windowColor;
+    this.edgeType = edgeType;
+    this.edgeColor = edgeColor;
+    this.typeface = typeface;
     this.edgeWidth = edgeWidth;
     this.shadow = shadow;
   }
