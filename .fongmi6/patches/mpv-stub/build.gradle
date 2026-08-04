@@ -17,16 +17,13 @@ android {
 }
 
 dependencies {
-    // 优先编译期依赖 CI 同批产出的 FongMi 定制 lib-common aar（release-1.10.1-fongmi），
-    // 保证 Player/Commands/CueGroup 等方法集与 app 运行时完全一致，杜绝 1.10.0 与 1.10.1 差异。
-    // 本地未跑 media3 构建时（无 libs/ 目录）回退官方 maven 1.10.0，仅用于快速语法自检。
-    def customCommon = file('libs/lib-common-release.aar')
-    if (customCommon.exists()) {
-        compileOnly files(customCommon)
-    } else {
-        compileOnly 'androidx.media3:media3-common:1.10.0'
-    }
-    // compileOnly 不传递依赖，androidx.annotation（MpvPlayer 的 @Nullable）需显式声明，
+    // 自编译的 FongMi 定制 media3 aar（compileOnly 提供编译期类型；运行时由 TV app/libs 提供同源 aar）
+    // 由 build-media3 workflow 在编译前从 /tmp/aars 拷贝到本工程 libs/
+    compileOnly files('libs/lib-common-release.aar')
+    compileOnly files('libs/lib-exoplayer-release.aar')
+    compileOnly files('libs/lib-datasource-release.aar')
+    compileOnly files('libs/lib-ui-release.aar')
+    // compileOnly 不传递依赖，androidx.annotation（@Nullable 等）需显式声明，
     // 否则 AGP 的 extractReleaseAnnotations 会因找不到注解而失败。
     compileOnly 'androidx.annotation:annotation:1.7.0'
 }
