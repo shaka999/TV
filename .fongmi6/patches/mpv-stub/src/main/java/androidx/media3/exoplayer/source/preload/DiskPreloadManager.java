@@ -3,8 +3,8 @@ package androidx.media3.exoplayer.source.preload;
 import androidx.annotation.NonNull;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PriorityTaskManager;
-import androidx.media3.datasource.Cache;
 import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.cache.Cache;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.RenderersFactory;
 
