@@ -50,21 +50,21 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew \
-            :lib-common:release \
-            :lib-exoplayer:release \
-            :lib-exoplayer-hls:release \
-            :lib-exoplayer-dash:release \
-            :lib-exoplayer-rtsp:release \
-            :lib-exoplayer-smoothstreaming:release \
-            :lib-datasource:release \
-            :lib-database:release \
-            :lib-decoder:release \
-            :lib-decoder-ffmpeg:release \
-            :lib-extractor:release \
-            :lib-effect:release \
-            :lib-session:release \
-            :lib-ui:release \
-            :lib-ui-danmaku:release \
+            :lib-common:assembleRelease \
+            :lib-exoplayer:assembleRelease \
+            :lib-exoplayer-hls:assembleRelease \
+            :lib-exoplayer-dash:assembleRelease \
+            :lib-exoplayer-rtsp:assembleRelease \
+            :lib-exoplayer-smoothstreaming:assembleRelease \
+            :lib-datasource:assembleRelease \
+            :lib-database:assembleRelease \
+            :lib-decoder:assembleRelease \
+            :lib-decoder-ffmpeg:assembleRelease \
+            :lib-extractor:assembleRelease \
+            :lib-effect:assembleRelease \
+            :lib-session:assembleRelease \
+            :lib-ui:assembleRelease \
+            :lib-ui-danmaku:assembleRelease \
             --no-daemon -x lint -x test -x javadoc
 
       - name: 收集 media3 aar
