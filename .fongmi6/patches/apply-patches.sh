@@ -96,6 +96,29 @@ if [ -f "$PBS" ] && grep -q 'stopForeground(STOP_FOREGROUND_REMOVE)' "$PBS"; the
     echo "    ✓ Service 兼容: $PBS"
 fi
 
+echo "==> [5.8/6] 移除 MPV 播放器选项（stub 不可用，选项误导用户）"
+echo "    1) select_engine 数组删 MPV 项（设置页只显示 EXO）"
+echo "    2) PlayerEngineDialog 删 mpv 点击/选中逻辑"
+echo "    3) PlayerSetting clamp 上限锁死 ENGINE_EXO（防旧偏好值越界）"
+STRINGS=app/src/main/res/values/strings.xml
+PED=app/src/main/java/com/fongmi/android/tv/ui/dialog/PlayerEngineDialog.java
+PS=app/src/main/java/com/fongmi/android/tv/setting/PlayerSetting.java
+if [ -f "$STRINGS" ]; then
+    sed -i '/<item>MPV<\/item>/d' "$STRINGS"
+    echo "    ✓ 数组移除 MPV: $STRINGS"
+fi
+if [ -f "$PED" ]; then
+    sed -i '/binding.mpv.setOnClickListener/d' "$PED"
+    sed -i '/binding.mpv.setSelected/d' "$PED"
+    sed -i 's/return getCurrentEngine(player) == PlayerSetting.ENGINE_MPV ? binding.mpv : binding.exo;/return binding.exo;/' "$PED"
+    echo "    ✓ 对话框移除 MPV: $PED"
+fi
+if [ -f "$PS" ]; then
+    sed -i 's/Math.clamp(Prefers.getInt("player_engine", ENGINE_EXO), ENGINE_EXO, ENGINE_MPV)/Math.clamp(Prefers.getInt("player_engine", ENGINE_EXO), ENGINE_EXO, ENGINE_EXO)/g' "$PS"
+    sed -i 's/Math.clamp(engine, ENGINE_EXO, ENGINE_MPV)/Math.clamp(engine, ENGINE_EXO, ENGINE_EXO)/g' "$PS"
+    echo "    ✓ 引擎锁死 EXO: $PS"
+fi
+
 echo "==> [6/6] 校验改动"
 echo "--- settings.gradle includes:"
 grep -n 'include' settings.gradle
@@ -115,6 +138,8 @@ echo "--- isInPictureInPictureMode() 残留调用（应为空）:"
 grep -rnE '\.isInPictureInPictureMode\(\)| isInPictureInPictureMode\(\)' app/src/ 2>/dev/null || echo "OK 无残留"
 echo "--- Service.stopForeground(STOP_FOREGROUND_REMOVE) 残留（应为空）:"
 grep -rn 'stopForeground(STOP_FOREGROUND_REMOVE)' app/src/ 2>/dev/null || echo "OK 无残留"
+echo "--- MPV 选项残留（应为空）:"
+grep -rn 'ENGINE_MPV\|<item>MPV</item>\|binding.mpv' app/src/ 2>/dev/null | grep -v 'isMpv' | head -5 || echo "OK 无残留"
 
 echo ""
 echo "✅ 构建层补丁应用完成。下一步：bash .fongmi6/scripts/fetch-media3.sh 拉 aar，然后 ./gradlew assemble"
