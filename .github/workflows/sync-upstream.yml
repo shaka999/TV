@@ -1,0 +1,45 @@
+name: Sync Upstream FongMi
+# 定期检测上游 FongMi/TV fongmi 分支更新，合并到本仓库 fongmi 追踪分支，并触发 build-tv
+on:
+  schedule:
+    - cron: '30 20 * * *'   # 每天 UTC 20:30（北京时间 4:30）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出 fongmi 追踪分支
+        uses: actions/checkout@v4
+        with:
+          ref: fongmi
+          fetch-depth: 0
+
+      - name: 合并上游 fongmi
+        run: |
+          git remote add upstream https://github.com/FongMi/TV.git 2>/dev/null || true
+          git fetch upstream fongmi --depth=1
+          if git diff --quiet upstream/fongmi HEAD --; then
+            echo "无上游更新，跳过"
+            echo "updated=false" >> $GITHUB_ENV
+          else
+            git merge --ff-only upstream/fongmi && git push origin fongmi
+            echo "✅ 已同步上游到 fongmi 分支"
+            echo "updated=true" >> $GITHUB_ENV
+          fi
+
+      - name: 触发 fongmi-6 构建
+        if: env.updated == 'true'
+        run: gh workflow run build-tv.yml --ref fongmi-6
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 触发 media3 重建（可选，上游 media 有更新时）
+        if: env.updated == 'true'
+        run: gh workflow run build-media3.yml || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

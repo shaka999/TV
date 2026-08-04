@@ -1,0 +1,97 @@
+name: Build Custom Media3
+# 编译 FongMi 定制 media3（release-1.10.1-fongmi）+ MPV 空实现 stub，产出 aar 发布到 Release。
+# 手动触发或每周一自动；TV 主构建依赖此 Release 的 aar。
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'   # 每周一 UTC 06:00（北京时间 14:00）
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出定制 media3
+        uses: actions/checkout@v4
+        with:
+          repository: FongMi/media
+          ref: release-1.10.1-fongmi
+          path: media
+          fetch-depth: 1
+
+      - name: 检出 TV fork（取 mpv-stub 工程）
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: fongmi-6
+          path: tv
+
+      - name: 安装 JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: 安装 Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 补装 SDK Platform 36
+        run: |
+          yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" >/dev/null 2>&1 || true
+          # 注：decoder_ffmpeg 的 FFmpeg native 需额外步骤（见 README），默认只编 Java 部分
+          # 如需软解 FFmpeg native，取消下行注释并配置 NDK + 拉取 FongMi/FFmpeg 到 src/main/jni/ffmpeg/
+          # yes | sdkmanager "ndk;27.2.12479018" "cmake;3.22.1" >/dev/null 2>&1 || true
+
+      - name: 编译定制 media3 模块
+        working-directory: media
+        run: |
+          chmod +x gradlew
+          ./gradlew \
+            :libraries:common:release \
+            :libraries:exoplayer:release \
+            :libraries:exoplayer_hls:release \
+            :libraries:exoplayer_dash:release \
+            :libraries:exoplayer_rtsp:release \
+            :libraries:exoplayer_smoothstreaming:release \
+            :libraries:datasource:release \
+            :libraries:database:release \
+            :libraries:decoder:release \
+            :libraries:decoder_ffmpeg:release \
+            :libraries:extractor:release \
+            :libraries:effect:release \
+            :libraries:session:release \
+            :libraries:ui:release \
+            :libraries:ui_danmaku:release \
+            --no-daemon -x lint -x test -x javadoc
+
+      - name: 收集 media3 aar
+        run: |
+          mkdir -p /tmp/aars
+          find media/libraries -path '*/build/outputs/aar/*-release.aar' -exec cp {} /tmp/aars/ \;
+          echo "media3 aar 数量: $(ls /tmp/aars/*.aar 2>/dev/null | wc -l)"
+
+      - name: 编译 MPV 空实现 stub
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.13'
+      - run: |
+          cd tv/.fongmi6/patches/mpv-stub
+          gradle assembleRelease --no-daemon
+          cp build/outputs/aar/*.aar /tmp/aars/mpvplayer-stub-release.aar
+
+      - name: 计算版本标签
+        id: tag
+        run: echo "name=media3-1.10.1-fongmi-$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+
+      - name: 发布 aar 到 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: Custom Media3 ${{ steps.tag.outputs.name }}
+          body: |
+            FongMi 定制 media3 (release-1.10.1-fongmi) + MPV 空实现 stub 的自编译 aar。
+            供 fongmi-6 分支 build-tv workflow 下载到 app/libs 使用。
+            注意：decoder_ffmpeg 默认只含 Java 部分（无 FFmpeg native），软解需额外编译。
+          files: /tmp/aars/*.aar

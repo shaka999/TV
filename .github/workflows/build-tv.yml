@@ -1,0 +1,91 @@
+name: Build TV (Android 6.0.1)
+# fongmi-6 主构建：merge 追踪分支 → 应用构建层补丁 → 拉 aar → 编 APK → 发布 Release
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [upstream-synced]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出 fongmi-6
+        uses: actions/checkout@v4
+        with:
+          ref: fongmi-6
+          fetch-depth: 0
+
+      - name: 安装 JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: 安装 Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 补装 SDK Platform 37（上游 compileSdk=37）
+        run: yes | sdkmanager "platforms;android-37" "build-tools;37.0.0" >/dev/null 2>&1 || true
+
+      - name: 合并追踪分支最新代码
+        run: |
+          git fetch origin fongmi
+          if git merge --no-edit origin/fongmi; then
+            echo "✅ 已合并 fongmi 追踪分支"
+          else
+            echo "!! merge 冲突（构建层补丁与上游冲突），请人工检查"
+            git merge --abort
+            exit 1
+          fi
+
+      - name: 应用构建层补丁
+        run: bash .fongmi6/patches/apply-patches.sh
+
+      - name: 配置签名
+        run: bash .fongmi6/scripts/setup-signing.sh
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+
+      - name: 拉取自编译 media3 + MPV stub aar
+        run: bash .fongmi6/scripts/fetch-media3.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 构建 APK（leanback armv7 + arm64）
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleLeanbackArmeabi_v7aRelease :app:assembleLeanbackArm64_v8aRelease \
+            --no-daemon -x lint
+
+      - name: 收集 APK
+        run: |
+          mkdir -p /tmp/apks
+          find app/build/outputs/apk -name '*-release.apk' -exec cp {} /tmp/apks/ \;
+          ls -la /tmp/apks/
+
+      - name: 计算版本标签
+        id: ver
+        run: |
+          VER=$(grep -oP 'versionName "\K[^"]+' app/build.gradle)
+          echo "tag=v${VER}-$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
+          echo "ver=$VER" >> $GITHUB_OUTPUT
+
+      - name: 发布 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: TV ${{ steps.ver.outputs.ver }} (Android 6.0.1 兼容构建)
+          body: |
+            基于 FongMi/TV 上游 + fongmi-6 构建层改动（兼容 Android 6.0.1 / API 23）。
+            - 已移除 chaquopy（Python 爬虫）
+            - minSdk 23
+            - 定制 media3 + MPV 空实现 stub（MPV 自动回退 ExoPlayer）
+            - 保留 fongmi-4.0.7 分支可随时回退
+            需 6.0.1 真机回归验证。
+          files: /tmp/apks/*.apk
+          prerelease: true

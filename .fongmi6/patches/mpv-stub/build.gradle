@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.library' version '8.12.3'
+}
+
+android {
+    namespace 'androidx.media3.mpvplayer'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 23
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // 仅编译期依赖官方 media3-common（提供 Player/MediaItem/TrackSelectionParameters 等标准类）。
+    // 运行时由 TV app/libs 里的 FongMi 定制 media3-common aar 提供类（1.10.x 内二进制兼容）。
+    // 如官方 1.10.0 不可用，可改为 'androidx.media3:media3-common:1.9.1' 或与定制版本对齐。
+    compileOnly 'androidx.media3:media3-common:1.10.0'
+}
