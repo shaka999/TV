@@ -46,13 +46,15 @@ jobs:
           echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME"
 
       - name: 构建 FFmpeg native（软解，armeabi-v7a + arm64-v8a）
-        # 按官方 decoder_ffmpeg README：clone FFmpeg release/6.0 → build_ffmpeg.sh 编静态库 → gradle 自动链接
-        # 全量 FFmpeg 仓库很大，用 --depth=1 只拉 6.0 分支
+        # 按官方 decoder_ffmpeg README：clone FFmpeg → build_ffmpeg.sh 编静态库 → gradle 自动链接
+        # 用 FongMi 自己的 release-8.1-fongmi 定制分支（与其定制 media3 配套，无 release/6.0 分支）
+        # 全量 FFmpeg 仓库很大，用 --depth=1 只拉该分支
         run: |
           FFMPEG_MODULE_PATH="$(pwd)/media/libraries/decoder_ffmpeg/src/main"
           cd "${FFMPEG_MODULE_PATH}/jni"
-          git clone --depth=1 --branch=release/6.0 https://github.com/FongMi/FFmpeg.git ffmpeg 2>&1 | tail -2
-          ls ffmpeg/ | head -5
+          git clone --depth=1 --branch=release-8.1-fongmi https://github.com/FongMi/FFmpeg.git ffmpeg 2>&1 | tail -3
+          if [ ! -f ffmpeg/configure ]; then echo "!! FFmpeg clone 失败"; exit 1; fi
+          ls ffmpeg/ | head -3
           echo "FFmpeg 源码就绪"
           NDK_PATH="$ANDROID_NDK_HOME"
           echo "NDK: $NDK_PATH"
@@ -60,11 +62,11 @@ jobs:
           # 通用软解解码器集合（音频 + 视频，覆盖主流格式）
           ENABLED_DECODERS=(aac ac3 eac3 mp3 vorbis opus flac pcm_alaw pcm_mulaw pcm_s16le \
                             h264 hevc mpeg2video mpeg4 vp8 vp9 av1 wmav2 mjpeg)
-          # 先编 armv7，再编 arm64（每个约 5-10 分钟）
+          # 先编 armv7（ABI 23），再编 arm64（ABI 26），每个约 5-10 分钟
           ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 23 "${ENABLED_DECODERS[@]}" 2>&1 | tail -3
           ./build_ffmpeg.sh "${FFMPEG_MODULE_PATH}" "${NDK_PATH}" "linux-x86_64" 26 "${ENABLED_DECODERS[@]}" 2>&1 | tail -3
           echo "=== android-libs 产出 ==="
-          ls "${FFMPEG_MODULE_PATH}/jni/ffmpeg/android-libs/" 2>/dev/null || echo "!! android-libs 未生成"
+          ls "${FFMPEG_MODULE_PATH}/jni/ffmpeg/android-libs/" 2>/dev/null || { echo "!! android-libs 未生成"; exit 1; }
 
       - name: 打补丁：补齐 FongMi 私有 media3 API（C/CaptionStyleCompat/SubtitleView/PlayerView/ExoPlayer/DefaultRenderersFactory）
         run: |
