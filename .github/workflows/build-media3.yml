@@ -79,6 +79,9 @@ jobs:
         with:
           gradle-version: '8.13'
       - run: |
+          # 用同批产出的定制 lib-common aar 作为 stub 编译期类路径（保证 Player 方法集一致）
+          mkdir -p tv/.fongmi6/patches/mpv-stub/libs
+          cp /tmp/aars/lib-common-release.aar tv/.fongmi6/patches/mpv-stub/libs/
           cd tv/.fongmi6/patches/mpv-stub
           gradle assembleRelease --no-daemon --stacktrace
           cp build/outputs/aar/*.aar /tmp/aars/mpvplayer-stub-release.aar

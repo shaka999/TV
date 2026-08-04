@@ -4,17 +4,22 @@ import android.content.Context;
 import android.os.Looper;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.TextureView;
 import androidx.annotation.Nullable;
 import androidx.media3.common.AudioAttributes;
-import androidx.media3.common.Commands;
+import androidx.media3.common.DeviceInfo;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
-import androidx.media3.common.PlayerMessage;
 import androidx.media3.common.Timeline;
 import androidx.media3.common.TrackSelectionParameters;
+import androidx.media3.common.Tracks;
 import androidx.media3.common.VideoSize;
+import androidx.media3.common.text.CueGroup;
+import androidx.media3.common.util.Size;
 import androidx.media3.mpvplayer.audio.MpvAudioFilter;
 import androidx.media3.mpvplayer.video.MpvVideoEqualizer;
 import java.util.List;
@@ -197,6 +202,8 @@ public final class MpvPlayer implements Player {
   public void decreaseDeviceVolume(int flags) {}
   public void setDeviceMuted(boolean muted) {}
   public void setDeviceMuted(boolean muted, int flags) {}
+  public void setDeviceVolume(int volume) {}
+  public void setDeviceVolume(int volume, int flags) {}
   public void setAudioAttributes(AudioAttributes audioAttributes, boolean handleAudioFocus) {}
 
     // ---- Builder ----

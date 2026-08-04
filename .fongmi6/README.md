@@ -70,10 +70,10 @@ fongmi6/
 - 你只需在 6.0.1 真机上验证新包
 
 ## ⚠️ 已知风险与迭代点（首次构建可能需 1-2 轮微调）
-1. **MPV stub 方法签名**：118 个 Player 方法从官方 `release`（1.10.1）分支提取；stub 工程用 `media3-common:1.10.0` 编译，若 1.10.0 与 1.10.1 方法集有细微差异，CI 会报"未实现方法 X" → 按提示在 MpvPlayer.java 补该方法即可
+1. **MPV stub 方法签名**：118 个 Player 方法从定制 `release-1.10.1-fongmi` 分支提取；stub 工程优先用 CI 同批产出的定制 `lib-common-release.aar` 编译（`libs/` 目录），保证方法集与 app 运行时完全一致。若上游 media3 定制分支新增 Player 抽象方法，CI 会报"未实现方法 X" → 按提示在 MpvPlayer.java 补该方法即可。无 `libs/` 时回退官方 maven `1.10.0`（仅本地语法自检用）
 2. **overrideLibrary 包名**：列表沿用 `fongmi-4.0.7` 验证过的集合；5.5.8 私有 aar 包名若变，CI 报"library X minSdk Y" → 按报错把 X 包名加到 manifest 的 overrideLibrary 列表
 3. **FFmpeg native**：`build-media3.yml` 默认只编 `decoder_ffmpeg` 的 Java 部分（未放 FFmpeg 源码 → native 自动跳过）。结果：app 能编译、硬解可用，但**软解（FFmpeg）不可用**。需软解时：clone `FongMi/FFmpeg` 到 `media/libraries/decoder_ffmpeg/src/main/jni/ffmpeg/` + 装 NDK/CMake + 取消 workflow 里 NDK 行注释
-4. **media3-common 版本**：stub 工程用官方 maven `1.10.0`；若 google maven 无此版，改 build.gradle 为 `1.9.1` 或与定制版本对齐
+4. **media3-common 版本**：stub 工程优先用 CI 产出的定制 aar；仅回退路径依赖官方 maven `1.10.0`，若 google maven 无此版，改 build.gradle 回退版本即可
 5. **overrideLibrary 与移除 chaquo 共存**：override 列表含 `com.fongmi.chaquo`（无害，因模块已移除无对应库），无需删
 6. **已复查覆盖的 MPV 引用面**：全仓 import `androidx.media3.mpvplayer.*` 共 6 个文件（MpvUtil / MpvPlayerEngine / MpvPlayerEffect / MpvVideoEffectController / MpvAudioEffectFilter / AudioEffectProcessor），stub 已覆盖其全部类与方法（含 AudioChannelMix 的 mixStereoLeft/mixStereoRight/mixMono）；ExoUtil 用到的定制 API（DecodeTrackSelector / DefaultPreloadManager / EventLogger）均在自编译 exoplayer 模块内
 

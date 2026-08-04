@@ -17,10 +17,15 @@ android {
 }
 
 dependencies {
-    // 仅编译期依赖官方 media3-common（提供 Player/MediaItem/TrackSelectionParameters 等标准类）。
-    // 运行时由 TV app/libs 里的 FongMi 定制 media3-common aar 提供类（1.10.x 内二进制兼容）。
-    // 如官方 1.10.0 不可用，可改为 'androidx.media3:media3-common:1.9.1' 或与定制版本对齐。
-    compileOnly 'androidx.media3:media3-common:1.10.0'
+    // 优先编译期依赖 CI 同批产出的 FongMi 定制 lib-common aar（release-1.10.1-fongmi），
+    // 保证 Player/Commands/CueGroup 等方法集与 app 运行时完全一致，杜绝 1.10.0 与 1.10.1 差异。
+    // 本地未跑 media3 构建时（无 libs/ 目录）回退官方 maven 1.10.0，仅用于快速语法自检。
+    def customCommon = file('libs/lib-common-release.aar')
+    if (customCommon.exists()) {
+        compileOnly files(customCommon)
+    } else {
+        compileOnly 'androidx.media3:media3-common:1.10.0'
+    }
     // compileOnly 不传递依赖，androidx.annotation（MpvPlayer 的 @Nullable）需显式声明，
     // 否则 AGP 的 extractReleaseAnnotations 会因找不到注解而失败。
     compileOnly 'androidx.annotation:annotation:1.7.0'
