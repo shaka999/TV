@@ -65,7 +65,8 @@ jobs:
       - name: 收集 APK
         run: |
           mkdir -p /tmp/apks
-          find app/build/outputs/apk -name '*-release.apk' -exec cp {} /tmp/apks/ \;
+          # FongMi 自定义了 APK 命名（leanback-armeabi_v7a.apk，无 -release 后缀），匹配所有 apk
+          find app/build/outputs/apk -name '*.apk' -exec cp {} /tmp/apks/ \;
           ls -la /tmp/apks/
 
       - name: 计算版本标签
