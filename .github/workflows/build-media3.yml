@@ -63,6 +63,7 @@ jobs:
             :lib-datasource:assembleRelease \
             :lib-datasource-okhttp:assembleRelease \
             :lib-database:assembleRelease \
+            :lib-container:assembleRelease \
             :lib-decoder:assembleRelease \
             :lib-decoder-ffmpeg:assembleRelease \
             :lib-extractor:assembleRelease \
