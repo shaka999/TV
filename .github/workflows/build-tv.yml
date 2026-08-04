@@ -56,6 +56,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 版本号自动递增（保证可覆盖升级）
+        # versionCode 用日期时间戳（如 202608041410），每次构建都更大 → 已装旧版可直接覆盖
+        # versionName 保持 5.5.8（显示层），versionCode 负责升级判断
+        run: |
+          VC=$(date +%Y%m%d%H%M)
+          sed -i "s/^        versionCode [0-9]*/        versionCode $VC/" app/build.gradle
+          grep -n 'versionCode\|versionName' app/build.gradle | head -3
+          echo "VC=$VC" >> $GITHUB_ENV
+
       - name: 构建 APK（leanback armv7 + arm64）
         run: |
           chmod +x gradlew
@@ -73,14 +82,20 @@ jobs:
         id: ver
         run: |
           VER=$(grep -oP 'versionName "\K[^"]+' app/build.gradle)
-          echo "tag=v${VER}-$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
+          echo "tag=v${VER}-${VC}-$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
           echo "ver=$VER" >> $GITHUB_OUTPUT
 
-      - name: 推送到 4.0.7 软件内升级通道（fongmi-4.0.7/apk/release/）
-        # 不发布到 GitHub Release；改为推到 fongmi-4.0.7 分支的 apk/release/ 目录，
-        # 已装的 4.0.7 软件点"检查更新"时能检测到并下载安装
-        # 所需 Secrets：UPSTREAM_PAT（推荐，用 PAT；GITHUB_TOKEN 跨分支可能被拒）
-        run: bash .fongmi6/scripts/push-update-channel.sh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPSTREAM_PAT: ${{ secrets.UPSTREAM_PAT }}
+      - name: 发布 Release（固定签名，可覆盖升级）
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: TV ${{ steps.ver.outputs.ver }} (Android 6.0.1) v${{ env.VC }}
+          body: |
+            基于 FongMi/TV 上游 + fongmi-6 构建层改动（兼容 Android 6.0.1 / API 23）。
+            - 已移除 chaquopy（Python 爬虫）
+            - minSdk 23
+            - 定制 media3 + MPV 空实现 stub（MPV 自动回退 ExoPlayer）
+            - 固定签名：可覆盖升级旧版（签名一致）
+            - 保留 fongmi-4.0.7 分支可随时回退
+          files: /tmp/apks/*.apk
+          prerelease: true
