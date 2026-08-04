@@ -47,12 +47,13 @@ jobs:
 
       - name: 构建 FFmpeg native（软解，armeabi-v7a + arm64-v8a）
         # 按官方 decoder_ffmpeg README：clone FFmpeg → build_ffmpeg.sh 编静态库 → gradle 自动链接
-        # 用 FongMi 自己的 release-8.1-fongmi 定制分支（与其定制 media3 配套，无 release/6.0 分支）
-        # 全量 FFmpeg 仓库很大，用 --depth=1 只拉该分支
+        # 必须用 FFmpeg 6.0 的 tag n6.0：build_ffmpeg.sh 是 6.0 时代的（含 --disable-postproc 等参数），
+        # FongMi 定制分支 release-8.1-fongmi 是 8.1（已移除这些参数，configure 报 Unknown option）
+        # 全量 FFmpeg 仓库很大，用 --depth=1 + --branch=n6.0
         run: |
           FFMPEG_MODULE_PATH="$(pwd)/media/libraries/decoder_ffmpeg/src/main"
           cd "${FFMPEG_MODULE_PATH}/jni"
-          git clone --depth=1 --branch=release-8.1-fongmi https://github.com/FongMi/FFmpeg.git ffmpeg 2>&1 | tail -3
+          git clone --depth=1 --branch=n6.0 https://github.com/FongMi/FFmpeg.git ffmpeg 2>&1 | tail -3
           if [ ! -f ffmpeg/configure ]; then echo "!! FFmpeg clone 失败"; exit 1; fi
           ls ffmpeg/ | head -3
           echo "FFmpeg 源码就绪"
