@@ -86,6 +86,16 @@ for f in "${PIP_FILES[@]}"; do
     echo "    ✓ PiP 兼容: $f"
 done
 
+echo "==> [5.7/6] Service.stopForeground(int) 兼容（API 24+ → boolean）"
+echo "    API 24 才有的 Service.stopForeground(int flags) + STOP_FOREGROUND_REMOVE 常量，"
+echo "    API 23 只有已废弃的 stopForeground(boolean)，调用 int 版本即 NoSuchMethodError"
+echo "    修复：调用点从 stopForeground(STOP_FOREGROUND_REMOVE) 改为 stopForeground(true)（语义等价：移除前台 + 取消通知）"
+PBS=app/src/main/java/com/fongmi/android/tv/service/PlaybackService.java
+if [ -f "$PBS" ] && grep -q 'stopForeground(STOP_FOREGROUND_REMOVE)' "$PBS"; then
+    sed -i 's/stopForeground(STOP_FOREGROUND_REMOVE)/stopForeground(true)/g' "$PBS"
+    echo "    ✓ Service 兼容: $PBS"
+fi
+
 echo "==> [6/6] 校验改动"
 echo "--- settings.gradle includes:"
 grep -n 'include' settings.gradle
@@ -103,6 +113,8 @@ echo "--- HTML fromHtml 残留 2 参（应为空）:"
 grep -rn 'Html\.fromHtml([^)]*,[^)]*)' app/src/main/java/ 2>/dev/null || echo "OK 无残留"
 echo "--- isInPictureInPictureMode() 残留调用（应为空）:"
 grep -rnE '\.isInPictureInPictureMode\(\)| isInPictureInPictureMode\(\)' app/src/ 2>/dev/null || echo "OK 无残留"
+echo "--- Service.stopForeground(STOP_FOREGROUND_REMOVE) 残留（应为空）:"
+grep -rn 'stopForeground(STOP_FOREGROUND_REMOVE)' app/src/ 2>/dev/null || echo "OK 无残留"
 
 echo ""
 echo "✅ 构建层补丁应用完成。下一步：bash .fongmi6/scripts/fetch-media3.sh 拉 aar，然后 ./gradlew assemble"
