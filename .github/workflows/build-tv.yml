@@ -57,10 +57,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 版本号自动递增（保证可覆盖升级）
-        # versionCode 用日期时间戳（如 202608041410），每次构建都更大 → 已装旧版可直接覆盖
+        # versionCode 用 Unix 秒级时间戳（int 上限 21.47 亿，当前约 17.8 亿安全），每次构建都更大 → 已装旧版可直接覆盖
+        # ⚠️ 不能用 date +%Y%m%d%H%M（如 202608041410 ≈ 2e11 超出 int，Gradle 报 Value is null）
         # versionName 保持 5.5.8（显示层），versionCode 负责升级判断
         run: |
-          VC=$(date +%Y%m%d%H%M)
+          VC=$(date +%s)
           sed -i "s/^        versionCode [0-9]*/        versionCode $VC/" app/build.gradle
           grep -n 'versionCode\|versionName' app/build.gradle | head -3
           echo "VC=$VC" >> $GITHUB_ENV
