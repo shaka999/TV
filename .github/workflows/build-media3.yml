@@ -45,6 +45,11 @@ jobs:
           # 如需软解 FFmpeg native，取消下行注释并配置 NDK + 拉取 FongMi/FFmpeg 到 src/main/jni/ffmpeg/
           # yes | sdkmanager "ndk;27.2.12479018" "cmake;3.22.1" >/dev/null 2>&1 || true
 
+      - name: 打补丁：CaptionStyleCompat 增加 8 参构造（FongMi TV 依赖）
+        run: |
+          python3 tv/.fongmi6/scripts/patch-captionstyle.py \
+            media/libraries/ui/src/main/java/androidx/media3/ui/CaptionStyleCompat.java
+
       - name: 编译定制 media3 模块
         working-directory: media
         run: |
