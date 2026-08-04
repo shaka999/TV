@@ -76,17 +76,11 @@ jobs:
           echo "tag=v${VER}-$(date +%Y%m%d-%H%M)" >> $GITHUB_OUTPUT
           echo "ver=$VER" >> $GITHUB_OUTPUT
 
-      - name: 发布 Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.ver.outputs.tag }}
-          name: TV ${{ steps.ver.outputs.ver }} (Android 6.0.1 兼容构建)
-          body: |
-            基于 FongMi/TV 上游 + fongmi-6 构建层改动（兼容 Android 6.0.1 / API 23）。
-            - 已移除 chaquopy（Python 爬虫）
-            - minSdk 23
-            - 定制 media3 + MPV 空实现 stub（MPV 自动回退 ExoPlayer）
-            - 保留 fongmi-4.0.7 分支可随时回退
-            需 6.0.1 真机回归验证。
-          files: /tmp/apks/*.apk
-          prerelease: true
+      - name: 推送到 4.0.7 软件内升级通道（fongmi-4.0.7/apk/release/）
+        # 不发布到 GitHub Release；改为推到 fongmi-4.0.7 分支的 apk/release/ 目录，
+        # 已装的 4.0.7 软件点"检查更新"时能检测到并下载安装
+        # 所需 Secrets：UPSTREAM_PAT（推荐，用 PAT；GITHUB_TOKEN 跨分支可能被拒）
+        run: bash .fongmi6/scripts/push-update-channel.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_PAT: ${{ secrets.UPSTREAM_PAT }}
