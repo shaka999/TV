@@ -19,7 +19,7 @@ import androidx.media3.ui.TimeBar;
  */
 public class PlayerSeekView extends FrameLayout implements Player.Listener {
 
-    private final TimeBar timeBar;
+    private final DefaultTimeBar timeBar;
     @Nullable private Player player;
     private boolean scrubbing;
 
@@ -74,7 +74,6 @@ public class PlayerSeekView extends FrameLayout implements Player.Listener {
     public TimeBar getTimeBar() {
         return timeBar;
     }
-
     @Override
     public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
         update();
