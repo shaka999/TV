@@ -102,6 +102,10 @@ jobs:
           files: /tmp/aars/*.aar
 
       - name: 自动触发 TV 主构建（出 APK）
-        run: gh workflow run build-tv.yml --ref fongmi-6
+        # 本 workflow 的 checkout 都在子目录（media/、tv/），工作区根目录不是 git 仓库，
+        # gh 需要 cd 到含 .git 的 tv/ 下才能定位仓库。
+        run: |
+          cd tv
+          gh workflow run build-tv.yml --ref fongmi-6
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
