@@ -179,6 +179,7 @@ public final class MpvPlayer implements Player {
   public long getContentBufferedPosition() { return 0; }
   public AudioAttributes getAudioAttributes() { return null; }
   public float getVolume() { return 0; }
+  public void setVolume(float volume) {}
   public void mute() {}
   public void unmute() {}
   public void clearVideoSurface() {}
