@@ -80,7 +80,7 @@ jobs:
           gradle-version: '8.13'
       - run: |
           cd tv/.fongmi6/patches/mpv-stub
-          gradle assembleRelease --no-daemon
+          gradle assembleRelease --no-daemon --stacktrace
           cp build/outputs/aar/*.aar /tmp/aars/mpvplayer-stub-release.aar
 
       - name: 计算版本标签
