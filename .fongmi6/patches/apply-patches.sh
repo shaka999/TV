@@ -30,13 +30,18 @@ sed -i '/^chaquo-python = { id = "com.chaquo.python"/d' gradle/libs.versions.tom
 
 echo "==> [2.5/6] 移除 PyLoader（chaquopy 的 app 层副产物，引用 com.fongmi.chaquo）"
 rm -f app/src/main/java/com/fongmi/android/tv/api/loader/PyLoader.java
-# BaseLoader.java: 删除 pyLoader 字段/构造/调用（6 处）
-sed -i '/private final PyLoader pyLoader;/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-sed -i '/pyLoader = new PyLoader();/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-sed -i '/pyLoader.clear();/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-sed -i '/if (isPy(api)) return pyLoader.getSpider/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-sed -i '/else if (isPy(api)) pyLoader.setRecent/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
-sed -i '/if ("py".equals(params.get("do"))) return pyLoader.proxy(params);/d' app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
+BL=app/src/main/java/com/fongmi/android/tv/api/loader/BaseLoader.java
+# BaseLoader.java: 删除 pyLoader 字段/构造/调用
+sed -i '/private final PyLoader pyLoader;/d' "$BL"
+sed -i '/pyLoader = new PyLoader();/d' "$BL"
+sed -i '/pyLoader.clear();/d' "$BL"
+# 删除 getSpider 里的 if (isPy(...)) return pyLoader.getSpider(...) 分支。
+# ⚠️ 5.5.8 里这行是 if-else 链的开头，删掉后下一行 "else if (isJs(...))" 会变成孤立 else，
+#    必须同时把下一行开头的 "else " 去掉，否则编译报 "'else' without 'if'"。
+sed -i '/if (isPy(api)) return pyLoader.getSpider/d' "$BL"
+sed -i 's/^\( *\)else if (isJs(api)) return jsLoader\.getSpider/\1if (isJs(api)) return jsLoader.getSpider/' "$BL"
+sed -i '/else if (isPy(api)) pyLoader.setRecent/d' "$BL"
+sed -i '/if ("py".equals(params.get("do"))) return pyLoader.proxy(params);/d' "$BL"
 
 echo "==> [3/6] minSdk 24 -> 23（兼容 Android 6.0.1）"
 sed -i 's/^minSdk = "24"$/minSdk = "23"/' gradle/libs.versions.toml
