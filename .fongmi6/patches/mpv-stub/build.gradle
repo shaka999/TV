@@ -21,4 +21,7 @@ dependencies {
     // 运行时由 TV app/libs 里的 FongMi 定制 media3-common aar 提供类（1.10.x 内二进制兼容）。
     // 如官方 1.10.0 不可用，可改为 'androidx.media3:media3-common:1.9.1' 或与定制版本对齐。
     compileOnly 'androidx.media3:media3-common:1.10.0'
+    // compileOnly 不传递依赖，androidx.annotation（MpvPlayer 的 @Nullable）需显式声明，
+    // 否则 AGP 的 extractReleaseAnnotations 会因找不到注解而失败。
+    compileOnly 'androidx.annotation:annotation:1.7.0'
 }
